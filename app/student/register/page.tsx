@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
-import Image from "next/image"
 
 export default function StudentRegisterPage() {
   const router = useRouter()
@@ -79,9 +78,6 @@ export default function StudentRegisterPage() {
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden">
         <div className="p-6">
           <div className="text-center mb-6">
-            <div className="relative h-24 w-24 mx-auto mb-2">
-              <Image src="/placeholder.svg?height=96&width=96&text=👋" alt="Welcome" fill className="object-contain" />
-            </div>
             <h1 className="text-2xl font-bold text-blue-600">Regístrate</h1>
             <p className="text-gray-600">Ingresa tus datos para comenzar</p>
           </div>
@@ -112,12 +108,11 @@ export default function StudentRegisterPage() {
                 className="text-center text-lg tracking-wider"
               />
               <p className="text-xs text-gray-500">Ingresa el código que te dio tu profesor</p>
-              <p className="text-xs text-blue-500">Para pruebas, usa: DEMO123</p>
             </div>
 
             <Button
               type="submit"
-              className="w-full py-6 text-lg bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 rounded-xl font-bold"
+              className="w-full py-6 text-lg bg-green-500 hover:bg-green-600 rounded-xl font-bold"
               disabled={isLoading}
             >
               {isLoading ? "Registrando..." : "¡Comenzar!"}

@@ -117,7 +117,7 @@ export default function CreateClassPage() {
 
             <Button
               type="submit"
-              className="w-full py-6 text-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 rounded-xl font-bold"
+              className="w-full py-6 text-lg bg-blue-500 hover:bg-blue-600 rounded-xl font-bold"
               disabled={isLoading}
             >
               {isLoading ? "Creando..." : "Crear Clase"}

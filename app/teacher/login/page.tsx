@@ -58,7 +58,6 @@ export default function TeacherLoginPage() {
                 onChange={(e) => setUserId(e.target.value)}
                 required
               />
-              <p className="text-xs text-gray-500">Usa "teacher_123" para acceder como profesor demo</p>
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>

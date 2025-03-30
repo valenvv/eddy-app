@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import NavigationBar from "@/components/navigation-bar"
 import { toast } from "@/components/ui/use-toast"
 
 export default function LearningTestPage() {
@@ -78,8 +79,8 @@ export default function LearningTestPage() {
       setIsSubmitting(true)
 
       try {
-        // Get the studentId from localStorage or use default
-        const studentId = localStorage.getItem("studentId") || "student_123"
+        // In a real app, get the studentId from authentication
+        const studentId = "student_123"
 
         const response = await fetch("/api/students/learning-style", {
           method: "POST",
@@ -140,7 +141,7 @@ export default function LearningTestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-400 via-blue-300 to-purple-300 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-green-400 via-blue-300 to-purple-300 flex flex-col items-center p-4 pb-24">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden my-8">
         {!showResults ? (
           <div className="p-6">
@@ -162,7 +163,7 @@ export default function LearningTestPage() {
                   onClick={() => handleAnswer(option.id)}
                   disabled={isSubmitting}
                 >
-                  <span className="text-sm whitespace-normal break-words">{option.text}</span>
+                  <span className="text-lg">{option.text}</span>
                 </Button>
               ))}
             </div>
@@ -173,8 +174,8 @@ export default function LearningTestPage() {
             <h1 className="text-3xl font-bold text-purple-600 mb-2">{getLearningStyle().title}</h1>
             <p className="text-lg text-gray-600 mb-6">{getLearningStyle().description}</p>
 
-            <Link href="/student/dashboard">
-              <Button className="w-full py-6 text-lg bg-purple-500 hover:bg-purple-600 rounded-xl font-bold">
+            <Link href="/tasks">
+              <Button className="w-full py-6 text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-xl font-bold">
                 Ver mis tareas
                 <ArrowRight className="ml-2" />
               </Button>
@@ -182,6 +183,8 @@ export default function LearningTestPage() {
           </div>
         )}
       </div>
+
+      <NavigationBar />
     </div>
   )
 }

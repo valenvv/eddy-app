@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/components/ui/use-toast"
-import { Camera, Headphones, BookOpen, PenTool, Loader2, Plus, Trash2, Edit, ArrowLeft } from "lucide-react"
+import { Camera, Headphones, BookOpen, PenTool, Loader2, Plus, Trash2, ArrowLeft } from "lucide-react"
 import TeacherNavigationBar from "@/components/teacher-navigation-bar"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
@@ -463,9 +463,9 @@ export default function CreateTaskPage({ params }: { params: { id: string } }) {
       case "auditory":
         return "Auditivo"
       case "reading":
-        return "Lectura"
+        return "Lector"
       case "kinesthetic":
-        return "Práctico"
+        return "Kinestésico"
     }
   }
 
@@ -570,7 +570,7 @@ export default function CreateTaskPage({ params }: { params: { id: string } }) {
           <Button
             type="button"
             onClick={handleGenerateTasks}
-            className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 rounded-xl"
+            className="w-full bg-blue-500 hover:bg-blue-600 rounded-xl"
             disabled={isGenerating || !formData.subject}
           >
             {isGenerating ? (
@@ -595,7 +595,7 @@ export default function CreateTaskPage({ params }: { params: { id: string } }) {
               </p>
 
               <Tabs defaultValue="visual" className="mb-6">
-                <TabsList className="grid grid-cols-4 mb-4">
+                <TabsList className="grid grid-cols-4 mb-4 p-1 h-auto">
                   <TabsTrigger value="visual" className="flex flex-col items-center py-2">
                     <Camera className="h-5 w-5" />
                     <span className="text-xs mt-1">Visual</span>
@@ -606,11 +606,11 @@ export default function CreateTaskPage({ params }: { params: { id: string } }) {
                   </TabsTrigger>
                   <TabsTrigger value="reading" className="flex flex-col items-center py-2">
                     <BookOpen className="h-5 w-5" />
-                    <span className="text-xs mt-1">Lectura</span>
+                    <span className="text-xs mt-1">Lector</span>
                   </TabsTrigger>
                   <TabsTrigger value="kinesthetic" className="flex flex-col items-center py-2">
                     <PenTool className="h-5 w-5" />
-                    <span className="text-xs mt-1">Práctico</span>
+                    <span className="text-xs mt-1">Kinestésico</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -630,9 +630,6 @@ export default function CreateTaskPage({ params }: { params: { id: string } }) {
                                 <Label htmlFor={task.id} className="text-lg font-medium cursor-pointer">
                                   {task.title}
                                 </Label>
-                                <Button variant="ghost" size="sm" onClick={() => handleEditTask(style, task)}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
                               </div>
                               <p className="text-gray-600 mb-2">{task.description}</p>
                             </div>
@@ -650,7 +647,7 @@ export default function CreateTaskPage({ params }: { params: { id: string } }) {
 
               <Button
                 type="submit"
-                className="w-full py-6 text-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 rounded-xl font-bold"
+                className="w-full py-6 text-lg bg-blue-500 hover:bg-blue-600 rounded-xl font-bold"
                 disabled={isLoading}
               >
                 {isLoading ? (

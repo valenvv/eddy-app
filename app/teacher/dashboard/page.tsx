@@ -84,7 +84,7 @@ export default function TeacherDashboardPage() {
           )}
 
           <Link href="/teacher/create-class">
-            <Button className="w-full py-6 text-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 rounded-xl font-bold flex items-center justify-center gap-2">
+            <Button className="w-full py-6 text-lg bg-blue-500 hover:bg-blue-600 rounded-xl font-bold flex items-center justify-center gap-2">
               <Plus className="h-5 w-5" />
               <span>Crear Nueva Clase</span>
             </Button>

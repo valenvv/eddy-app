@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Image from "next/image"
-import { Award, BookOpen, Plus, Camera, Headphones, PenTool } from "lucide-react"
+import { Award, BookOpen, Plus, Camera, Headphones, PenTool, User } from "lucide-react"
 import NavigationBar from "@/components/navigation-bar"
 import { toast } from "@/components/ui/use-toast"
 import {
@@ -232,13 +231,8 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex flex-col items-center mb-6">
-            <div className="relative h-24 w-24 mb-3">
-              <Image
-                src="/placeholder.svg?height=96&width=96&text=Avatar"
-                alt="Avatar del usuario"
-                fill
-                className="object-cover rounded-full border-4 border-purple-300"
-              />
+            <div className="relative h-24 w-24 mb-3 rounded-full overflow-hidden bg-gradient-to-br from-purple-300 via-pink-200 to-blue-300 flex items-center justify-center border-4 border-white shadow-lg">
+              <User className="h-14 w-14 text-white" strokeWidth={1.5} />
             </div>
 
             <h2 className="text-xl font-bold mb-1">{username}</h2>
@@ -345,7 +339,7 @@ export default function ProfilePage() {
                 maxLength={6}
               />
             </div>
-            <p className="text-xs text-blue-500">Para pruebas, usa: DEMO123</p>
+
           </div>
           <DialogFooter>
             <Button type="submit" onClick={handleJoinClass} disabled={isJoining}>

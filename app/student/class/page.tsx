@@ -40,8 +40,17 @@ export default function StudentClassPage() {
             content: sub.content,
             taskId: sub.task_id,
             createdAt: sub.created_at,
+            fileUrl: sub.file_url, // Assuming the API returns a file_url
           }
         })
+
+        console.log(
+          "Submissions with file URLs:",
+          formattedSubmissions.map((sub) => ({
+            id: sub.id,
+            fileUrl: sub.fileUrl,
+          })),
+        )
 
         setSubmissions(formattedSubmissions)
       } catch (error) {
@@ -105,14 +114,22 @@ export default function StudentClassPage() {
                   </div>
 
                   <div className="p-3">
-                    <div className="relative h-32 w-full bg-gray-100 rounded-lg mb-2">
-                      <Image
-                        src={`/placeholder.svg?height=128&width=320&text=${solution.type}`}
-                        alt={solution.title}
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    </div>
+                    {solution.fileUrl ? (
+                      <div className="relative h-32 w-full bg-gray-100 rounded-lg mb-2">
+                        <Image
+                          src={solution.fileUrl || "/placeholder.svg"}
+                          alt={solution.title}
+                          fill
+                          className="object-cover rounded-lg"
+                          onError={(e) => {
+                            // When image fails to load, replace with placeholder
+                            const target = e.target as HTMLImageElement
+                            target.onerror = null // Prevent infinite error loop
+                            target.src = `/placeholder.svg?height=128&width=320&text=${solution.type}`
+                          }}
+                        />
+                      </div>
+                    ) : null}
 
                     <h4 className="font-medium mb-1">{solution.title}</h4>
                   </div>

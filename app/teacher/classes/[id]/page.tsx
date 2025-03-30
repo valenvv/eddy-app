@@ -179,7 +179,7 @@ export default function ClassPage({ params }: { params: { id: string } }) {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold">Tareas</h2>
                   <Link href={`/teacher/classes/${params.id}/create-task`}>
-                    <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600">
+                    <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600">
                       <Plus className="h-4 w-4" />
                       <span>Crear Tarea</span>
                     </Button>

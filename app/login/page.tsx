@@ -56,7 +56,6 @@ export default function LoginPage() {
                 onChange={(e) => setUserId(e.target.value)}
                 required
               />
-              <p className="text-xs text-gray-500">Usa "student_123" para estudiante o "teacher_123" para profesor</p>
             </div>
 
             <div className="space-y-2">

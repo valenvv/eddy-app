@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/auth-context"
+import { Logo } from "@/components/logo"
 
 export default function StudentLoginPage() {
   const router = useRouter()
@@ -54,7 +55,6 @@ export default function StudentLoginPage() {
                 onChange={(e) => setUserId(e.target.value)}
                 required
               />
-              <p className="text-xs text-gray-500">Usa "student_123" para acceder como estudiante demo</p>
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>

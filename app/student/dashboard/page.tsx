@@ -37,7 +37,27 @@ export default function StudentDashboardPage() {
         }
 
         const tasksData = await tasksResponse.json()
-        setTasks(tasksData)
+
+        // Fetch classes to get class names
+        const classesResponse = await fetch(`/api/students/classes?studentId=${studentId}`)
+        let classesMap = {}
+
+        if (classesResponse.ok) {
+          const classesData = await classesResponse.json()
+          // Create a map of classId -> className for easy lookup
+          classesMap = classesData.reduce((map, cls) => {
+            map[cls.id] = cls.name
+            return map
+          }, {})
+        }
+
+        // Add class name to each task
+        const tasksWithClassNames = tasksData.map((task) => ({
+          ...task,
+          className: classesMap[task.classId] || "Clase sin nombre",
+        }))
+
+        setTasks(tasksWithClassNames)
 
         // Fetch all submissions by this student to determine completed tasks
         const submissionsResponse = await fetch(`/api/students/submissions?studentId=${studentId}`)
@@ -80,6 +100,7 @@ export default function StudentDashboardPage() {
       ...t,
       taskId: task.id,
       color: getColorForLearningStyle(learningStyle || "visual"),
+      className: task.className, // Add class name
     }))
   })
 
@@ -94,6 +115,7 @@ export default function StudentDashboardPage() {
       ...t,
       taskId: task.id,
       color: "bg-green-100",
+      className: task.className, // Add class name
     }))
   })
 
@@ -148,6 +170,7 @@ export default function StudentDashboardPage() {
                           <div>
                             <h3 className="font-medium">{task.title}</h3>
                             <p className="text-xs text-gray-600 line-clamp-1">{task.description}</p>
+                            <p className="text-xs font-medium text-gray-700 mt-1">Clase: {task.className}</p>
                           </div>
                         </div>
                       </Card>
@@ -170,6 +193,7 @@ export default function StudentDashboardPage() {
                         <div>
                           <h3 className="font-medium">{task.title}</h3>
                           <p className="text-xs text-gray-600 line-clamp-1">{task.description}</p>
+                          <p className="text-xs font-medium text-gray-700 mt-1">Clase: {task.className}</p>
                         </div>
                         <div className="bg-white rounded-full p-1">
                           <CheckCircle className="h-5 w-5 text-green-500" />

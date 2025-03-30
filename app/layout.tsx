@@ -9,8 +9,8 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "App Educativa",
-  description: "Una aplicación educativa personalizada para niños",
+  title: "Eddy",
+  description: "Acompaña tu aprendizaje con Eddy",
     generator: 'v0.dev'
 }
 

@@ -25,8 +25,8 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
   const learningStyles = [
     { id: "visual", name: "Visual", icon: <Camera className="h-5 w-5" /> },
     { id: "auditory", name: "Auditivo", icon: <Headphones className="h-5 w-5" /> },
-    { id: "reading", name: "Lectura", icon: <BookOpen className="h-5 w-5" /> },
-    { id: "kinesthetic", name: "Práctico", icon: <PenTool className="h-5 w-5" /> },
+    { id: "reading", name: "Lector", icon: <BookOpen className="h-5 w-5" /> },
+    { id: "kinesthetic", name: "Kinestésico", icon: <PenTool className="h-5 w-5" /> },
   ]
 
   useEffect(() => {
@@ -148,7 +148,7 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-yellow-400 via-orange-300 to-red-300 flex flex-col items-center justify-center p-4">
         <p>Cargando detalles de la tarea...</p>
       </div>
     )
@@ -156,7 +156,7 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
 
   if (!task) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-yellow-400 via-orange-300 to-red-300 flex flex-col items-center justify-center p-4">
         <p>No se encontró la tarea</p>
         <Button onClick={() => router.push("/student/dashboard")} className="mt-4">
           Volver al tablero
@@ -166,7 +166,7 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center p-4 pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-yellow-400 via-orange-300 to-red-300 flex flex-col items-center p-4 pb-24">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden my-8">
         <div className="p-6">
           <div className="mb-4">
@@ -174,13 +174,13 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
               variant="ghost"
               size="sm"
               onClick={() => router.push("/student/dashboard")}
-              className="flex items-center text-blue-600 hover:text-blue-800"
+              className="flex items-center text-orange-600 hover:text-orange-800"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
               <span>Volver</span>
             </Button>
           </div>
-          <h1 className="text-2xl font-bold text-indigo-600 mb-4">Detalles de la Tarea</h1>
+          <h1 className="text-2xl font-bold text-orange-600 mb-4">Detalles de la Tarea</h1>
 
           <div className="mb-6">
             <h2 className="text-lg font-medium mb-2">¿Quieres probar otro estilo de aprendizaje?</h2>
@@ -189,11 +189,11 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
             </p>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
-              <TabsList className="grid grid-cols-4">
+              <TabsList className="grid grid-cols-4 h-auto p-1">
                 {learningStyles.map((style) => (
-                  <TabsTrigger key={style.id} value={style.id} className="flex flex-col items-center py-2">
+                  <TabsTrigger key={style.id} value={style.id} className="flex flex-col items-center py-3 px-2">
                     {style.icon}
-                    <span className="text-xs mt-1">{style.name}</span>
+                    <span className="text-xs mt-2">{style.name}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -241,11 +241,7 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
-              disabled={submitting}
-            >
+            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600" disabled={submitting}>
               {submitting ? "Enviando..." : "Entregar Tarea"}
             </Button>
           </form>
