@@ -1,61 +1,49 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
-import { Heart, MessageCircle, Video, Mic, FileText, PenTool } from "lucide-react"
+import { Video, Mic, FileText, PenTool } from "lucide-react"
 import NavigationBar from "@/components/navigation-bar"
 import { toast } from "@/components/ui/use-toast"
 
 export default function StudentClassPage() {
-  const [likes, setLikes] = useState<Record<string, boolean>>({})
   const [submissions, setSubmissions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        // In a real app, get the studentId from authentication
-        const studentId = "student_123"
+        // Get the student ID
+        const studentId = localStorage.getItem("studentId") || "student_123"
 
-        // Fetch tasks for the student's classes
-        const tasksResponse = await fetch(`/api/tasks?studentId=${studentId}`)
+        // Fetch submissions from classmates
+        const submissionsResponse = await fetch(`/api/students/classmates-submissions?studentId=${studentId}`)
 
-        if (!tasksResponse.ok) {
-          throw new Error("Failed to fetch tasks")
+        if (!submissionsResponse.ok) {
+          throw new Error("Failed to fetch submissions")
         }
 
-        const tasksData = await tasksResponse.json()
+        const submissionsData = await submissionsResponse.json()
 
-        if (tasksData.length > 0) {
-          // Fetch submissions for the first task
-          const submissionsResponse = await fetch(`/api/tasks/${tasksData[0].id}/submissions`)
+        // Transform the data for display
+        const formattedSubmissions = submissionsData.map((sub: any) => {
+          const submissionTypes = ["video", "audio", "text", "drawing"]
+          const randomType = submissionTypes[Math.floor(Math.random() * submissionTypes.length)]
 
-          if (!submissionsResponse.ok) {
-            throw new Error("Failed to fetch submissions")
+          return {
+            id: sub.id,
+            name: sub.student_id, // Show full student ID
+            type: randomType,
+            icon: getIconForType(randomType),
+            title: sub.content.slice(0, 30) + (sub.content.length > 30 ? "..." : ""),
+            content: sub.content,
+            taskId: sub.task_id,
+            createdAt: sub.created_at,
           }
+        })
 
-          const submissionsData = await submissionsResponse.json()
-
-          // Transform the data for display
-          const formattedSubmissions = submissionsData.map((sub: any) => {
-            const submissionTypes = ["video", "audio", "text", "drawing"]
-            const randomType = submissionTypes[Math.floor(Math.random() * submissionTypes.length)]
-            const randomLikes = Math.floor(Math.random() * 20)
-
-            return {
-              id: sub.id,
-              name: `Estudiante ${sub.studentId.slice(-3)}`,
-              type: randomType,
-              icon: getIconForType(randomType),
-              title: sub.content.slice(0, 30) + (sub.content.length > 30 ? "..." : ""),
-              likes: randomLikes,
-            }
-          })
-
-          setSubmissions(formattedSubmissions)
-        }
+        setSubmissions(formattedSubmissions)
       } catch (error) {
         toast({
           title: "Error",
@@ -85,13 +73,6 @@ export default function StudentClassPage() {
     }
   }
 
-  const handleLike = (id: string) => {
-    setLikes((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center justify-center p-4">
@@ -111,7 +92,7 @@ export default function StudentClassPage() {
             {submissions.length > 0 ? (
               submissions.map((solution) => (
                 <Card key={solution.id} className="overflow-hidden">
-                  <div className="bg-indigo-50 p-3 flex items-center justify-between">
+                  <div className="bg-indigo-50 p-3 flex items-center">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center">
                         {solution.icon}
@@ -121,10 +102,6 @@ export default function StudentClassPage() {
                         <p className="text-xs text-gray-500">{solution.type}</p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm" className="text-xs" onClick={() => {}}>
-                      <MessageCircle className="h-4 w-4 mr-1" />
-                      Ver
-                    </Button>
                   </div>
 
                   <div className="p-3">
@@ -138,18 +115,6 @@ export default function StudentClassPage() {
                     </div>
 
                     <h4 className="font-medium mb-1">{solution.title}</h4>
-
-                    <div className="flex items-center justify-between">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={`text-xs ${likes[solution.id] ? "text-red-500" : ""}`}
-                        onClick={() => handleLike(solution.id)}
-                      >
-                        <Heart className={`h-4 w-4 mr-1 ${likes[solution.id] ? "fill-red-500" : ""}`} />
-                        ¡Qué genial! ({solution.likes + (likes[solution.id] ? 1 : 0)})
-                      </Button>
-                    </div>
                   </div>
                 </Card>
               ))

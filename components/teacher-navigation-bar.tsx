@@ -1,8 +1,10 @@
+// Comentar todo el componente para que no se muestre
+/*
 "use client"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Users, BookOpen, Settings } from "lucide-react"
+import { Home, Users, BookOpen, Settings } from 'lucide-react'
 
 export default function TeacherNavigationBar() {
   const pathname = usePathname()
@@ -52,5 +54,11 @@ export default function TeacherNavigationBar() {
       </div>
     </div>
   )
+}
+*/
+
+// Exportar un componente vacío para evitar errores de importación
+export default function TeacherNavigationBar() {
+  return null
 }
 

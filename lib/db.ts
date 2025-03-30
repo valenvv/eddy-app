@@ -1,85 +1,13 @@
-// This file simulates a database for our application
-// In a real application, this would be replaced with a proper database
+// This file is now deprecated as we're using Supabase
+// It's kept for reference but no longer used in the application
 
-// Shared data stores
+// Shared data stores - these are now in Supabase tables
 export const classesData: any[] = []
 export const tasksData: any[] = []
 export const submissionsData: any[] = []
 export const studentsData: any[] = []
 
-// Add some initial demo data
-// Demo class
-const demoClassId = "class_demo_1"
-if (!classesData.some((c) => c.id === demoClassId)) {
-  classesData.push({
-    id: demoClassId,
-    name: "Ciencias Naturales",
-    teacherId: "teacher_123",
-    description: "Clase demo para ciencias naturales",
-    students: [
-      {
-        id: "student_123",
-        joinedAt: new Date().toISOString(),
-        learningStyle: "visual",
-      },
-    ],
-    tasks: ["task_demo_1"],
-    inviteCode: "DEMO123",
-    createdAt: new Date().toISOString(),
-  })
-}
-
-// Demo task
-const demoTaskId = "task_demo_1"
-if (!tasksData.some((t) => t.id === demoTaskId)) {
-  tasksData.push({
-    id: demoTaskId,
-    classId: demoClassId,
-    tasksByLearningStyle: {
-      visual: [
-        {
-          id: "visual_task_1",
-          title: "Crear un mapa mental sobre el Sistema Solar",
-          description: "Diseña un mapa mental colorido que muestre los planetas y sus características.",
-        },
-      ],
-      auditory: [
-        {
-          id: "auditory_task_1",
-          title: "Grabar una explicación sobre el Sistema Solar",
-          description: "Graba un audio explicando los planetas del Sistema Solar.",
-        },
-      ],
-      reading: [
-        {
-          id: "reading_task_1",
-          title: "Escribir un resumen sobre el Sistema Solar",
-          description: "Escribe un resumen detallado sobre los planetas del Sistema Solar.",
-        },
-      ],
-      kinesthetic: [
-        {
-          id: "kinesthetic_task_1",
-          title: "Construir un modelo del Sistema Solar",
-          description: "Construye un modelo 3D del Sistema Solar con materiales reciclados.",
-        },
-      ],
-    },
-    submissions: [],
-    createdAt: new Date().toISOString(),
-  })
-}
-
-// Demo student
-if (!studentsData.some((s) => s.id === "student_123")) {
-  studentsData.push({
-    id: "student_123",
-    learningStyle: "visual",
-    createdAt: new Date().toISOString(),
-  })
-}
-
-// Helper functions for working with our "database"
+// Helper functions - these are now handled by Supabase queries
 export function getClassById(id: string) {
   return classesData.find((cls) => cls.id === id)
 }
@@ -109,28 +37,7 @@ export function getStudentById(id: string) {
 }
 
 export function updateStudentLearningStyle(studentId: string, learningStyle: string) {
-  const studentIndex = studentsData.findIndex((student) => student.id === studentId)
-
-  if (studentIndex === -1) {
-    // Create new student if not exists
-    studentsData.push({
-      id: studentId,
-      learningStyle,
-      createdAt: new Date().toISOString(),
-    })
-  } else {
-    // Update existing student
-    studentsData[studentIndex].learningStyle = learningStyle
-  }
-
-  // Also update learning style in all classes student is in
-  classesData.forEach((cls, index) => {
-    const studentIndex = cls.students.findIndex((student: any) => student.id === studentId)
-    if (studentIndex !== -1) {
-      cls.students[studentIndex].learningStyle = learningStyle
-    }
-  })
-
+  // This functionality is now handled by the learning-style API
   return { studentId, learningStyle }
 }
 

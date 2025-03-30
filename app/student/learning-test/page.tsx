@@ -17,30 +17,51 @@ export default function LearningTestPage() {
 
   const questions = [
     {
-      question: "¿Cómo te gusta aprender más?",
+      question: "Quiero aprender a jugar un nuevo juego de mesa o de cartas. Yo:",
       options: [
-        { id: "visual", text: "Viendo imágenes y videos", icon: "👁️" },
-        { id: "auditory", text: "Escuchando explicaciones", icon: "👂" },
-        { id: "kinesthetic", text: "Haciendo actividades prácticas", icon: "✋" },
-        { id: "reading", text: "Leyendo instrucciones", icon: "📚" },
+        { id: "kinesthetic", text: "Observaría a otros jugar antes de unirme al juego." },
+        { id: "auditory", text: "Escucharía a alguien que lo explicara y haría preguntas." },
+        {
+          id: "visual",
+          text: "Utilizaría los diagramas que explican las distintas fases, movimientos y estrategias del juego.",
+        },
+        { id: "reading", text: "Leería las instrucciones." },
       ],
     },
     {
-      question: "¿Qué actividad prefieres?",
+      question: "Quiero aprender a hacer algo nuevo en una computadora. Yo:",
       options: [
-        { id: "visual", text: "Dibujar y colorear", icon: "🎨" },
-        { id: "auditory", text: "Cantar o escuchar música", icon: "🎵" },
-        { id: "kinesthetic", text: "Jugar deportes", icon: "⚽" },
-        { id: "reading", text: "Leer cuentos", icon: "📖" },
+        { id: "reading", text: "Leería las instrucciones escritas que vienen con el programa." },
+        { id: "auditory", text: "Hablaría con personas que conozcan el programa." },
+        { id: "kinesthetic", text: "Empezaría a utilizarlo y aprender por ensayo y error." },
+        { id: "visual", text: "Seguiría los diagramas de un libro." },
       ],
     },
     {
-      question: "¿Cómo recuerdas mejor las cosas?",
+      question: "Prefiero un profesor o maestro que utilice:",
       options: [
-        { id: "visual", text: "Con imágenes y colores", icon: "🌈" },
-        { id: "auditory", text: "Repitiendo en voz alta", icon: "🗣️" },
-        { id: "kinesthetic", text: "Moviéndote o actuando", icon: "🏃" },
-        { id: "reading", text: "Escribiendo notas", icon: "✏️" },
+        { id: "kinesthetic", text: "Demostraciones, modelos o sesiones prácticas." },
+        { id: "auditory", text: "Preguntas y respuestas, charlas, discusiones en grupo u oradores invitados." },
+        { id: "reading", text: "Folletos, libros o lecturas." },
+        { id: "visual", text: "Diagramas, cuadros, mapas o gráficos." },
+      ],
+    },
+    {
+      question: "Acabo de terminar una competencia o una prueba y quiero recibir una opinión. Me gustaría recibirla:",
+      options: [
+        { id: "kinesthetic", text: "Utilizando ejemplos de lo que he hecho." },
+        { id: "reading", text: "Mediante una descripción escrita de mis resultados." },
+        { id: "auditory", text: "De alguien que lo hable conmigo." },
+        { id: "visual", text: "Mediante gráficos que muestren lo que alcancé." },
+      ],
+    },
+    {
+      question: "Cuando aprendo de Internet, me gusta:",
+      options: [
+        { id: "kinesthetic", text: "Los vídeos que muestran cómo hacer o fabricar algo." },
+        { id: "visual", text: "El diseño y las características visuales interesantes." },
+        { id: "reading", text: "Descripciones, listas y explicaciones escritas interesantes." },
+        { id: "auditory", text: "Los canales de audio donde puedo escuchar podcasts o entrevistas." },
       ],
     },
   ]
@@ -141,7 +162,6 @@ export default function LearningTestPage() {
                   onClick={() => handleAnswer(option.id)}
                   disabled={isSubmitting}
                 >
-                  <span className="text-2xl mr-4">{option.icon}</span>
                   <span className="text-lg">{option.text}</span>
                 </Button>
               ))}

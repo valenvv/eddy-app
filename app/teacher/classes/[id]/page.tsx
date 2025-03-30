@@ -14,6 +14,7 @@ export default function ClassPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [classData, setClassData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [copySuccess, setCopySuccess] = useState(false)
 
   useEffect(() => {
     const fetchClass = async () => {
@@ -25,6 +26,7 @@ export default function ClassPage({ params }: { params: { id: string } }) {
         }
 
         const data = await response.json()
+        console.log("Class data:", data) // Para depuración
         setClassData(data)
       } catch (error) {
         toast({
@@ -40,13 +42,63 @@ export default function ClassPage({ params }: { params: { id: string } }) {
     fetchClass()
   }, [params.id])
 
-  const copyInviteCode = () => {
-    if (classData?.inviteCode) {
-      navigator.clipboard.writeText(classData.inviteCode)
+  // Función para determinar el nombre correcto de la propiedad del código de invitación
+  const getInviteCode = () => {
+    if (!classData) return ""
+
+    // Verificar diferentes posibles nombres de propiedad
+    if (classData.inviteCode) return classData.inviteCode
+    if (classData.invite_code) return classData.invite_code
+    if (classData.code) return classData.code
+
+    // Si no encontramos ninguna propiedad conocida, registrar el objeto para depuración
+    console.log("No se encontró código de invitación en:", classData)
+    return ""
+  }
+
+  const copyInviteCode = async () => {
+    const inviteCode = getInviteCode()
+
+    if (!inviteCode) {
       toast({
-        title: "Código copiado",
-        description: "Comparte este código con tus estudiantes",
+        title: "Error",
+        description: "No se pudo encontrar el código de invitación",
+        variant: "destructive",
       })
+      return
+    }
+
+    try {
+      // Método 1: API moderna del portapapeles
+      await navigator.clipboard.writeText(inviteCode)
+      setCopySuccess(true)
+      toast({
+        title: "¡Código copiado!",
+        description: "El código de invitación ha sido copiado al portapapeles",
+      })
+    } catch (err) {
+      try {
+        // Método 2: Elemento de texto temporal
+        const textArea = document.createElement("textarea")
+        textArea.value = inviteCode
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand("copy")
+        document.body.removeChild(textArea)
+        setCopySuccess(true)
+        toast({
+          title: "¡Código copiado!",
+          description: "El código de invitación ha sido copiado al portapapeles",
+        })
+      } catch (e) {
+        console.error("Error al copiar:", e)
+        setCopySuccess(false)
+        toast({
+          title: "Error al copiar",
+          description: "No se pudo copiar el código. Por favor, inténtalo manualmente.",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -66,15 +118,21 @@ export default function ClassPage({ params }: { params: { id: string } }) {
     )
   }
 
+  const inviteCode = getInviteCode()
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center p-4 pb-24">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden my-8">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-blue-600">{classData.name}</h1>
-            <Button onClick={copyInviteCode} variant="outline" className="flex items-center gap-2">
+            <Button
+              onClick={copyInviteCode}
+              variant="outline"
+              className={`flex items-center gap-2 ${copySuccess ? "bg-green-100" : ""}`}
+            >
               <Copy className="h-4 w-4" />
-              <span>{classData.inviteCode}</span>
+              <span>{inviteCode || "Sin código"}</span>
             </Button>
           </div>
 
@@ -130,13 +188,10 @@ export default function ClassPage({ params }: { params: { id: string } }) {
 
                 {classData.tasks && classData.tasks.length > 0 ? (
                   <div className="space-y-2">
-                    {classData.tasks.map((taskId: string) => (
-                      <Link key={taskId} href={`/teacher/classes/${params.id}/tasks/${taskId}`}>
-                        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-gray-100 cursor-pointer">
-                          <p className="font-medium">Tarea ID: {taskId}</p>
-                          <p className="text-sm text-gray-500">Ver Detalles</p>
-                        </div>
-                      </Link>
+                    {classData.tasks.map((task: any) => (
+                      <div key={task.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                        <p className="font-medium">{task.theme || "Sin tema"}</p>
+                      </div>
                     ))}
                   </div>
                 ) : (

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import { Upload, Check, Camera, Headphones, BookOpen, PenTool } from "lucide-react"
+import { Upload, Check, Camera, Headphones, BookOpen, PenTool, ArrowLeft } from "lucide-react"
 import NavigationBar from "@/components/navigation-bar"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -120,6 +120,7 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
         description: "Tu profesor revisará tu trabajo pronto",
       })
 
+      // Redirect to dashboard after successful submission
       router.push("/student/dashboard")
     } catch (error) {
       toast({
@@ -168,6 +169,17 @@ export default function TaskDetailPage({ params }: { params: { id: string } }) {
     <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center p-4 pb-24">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden my-8">
         <div className="p-6">
+          <div className="mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/student/dashboard")}
+              className="flex items-center text-blue-600 hover:text-blue-800"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              <span>Volver</span>
+            </Button>
+          </div>
           <h1 className="text-2xl font-bold text-indigo-600 mb-4">Detalles de la Tarea</h1>
 
           <div className="mb-6">

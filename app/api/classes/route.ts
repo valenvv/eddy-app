@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { classesData } from "@/lib/db"
+import { supabaseAdmin } from "@/lib/supabase"
 
 export async function POST(request: Request) {
   try {
@@ -10,24 +10,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Name and teacherId are required" }, { status: 400 })
     }
 
-    const classId = `class_${Date.now()}`
-    const newClass = {
-      id: classId,
-      name,
-      teacherId,
-      description: description || "",
-      students: [],
-      tasks: [],
-      inviteCode: generateInviteCode(),
-      createdAt: new Date().toISOString(),
-    }
+    // Generate a unique invite code
+    const inviteCode = generateInviteCode()
 
-    classesData.push(newClass)
+    const { data: newClass, error } = await supabaseAdmin
+      .from("classes")
+      .insert([
+        {
+          name,
+          teacher_id: teacherId,
+          description: description || "",
+          invite_code: inviteCode,
+        },
+      ])
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error creating class:", error)
+      return NextResponse.json({ error: "Failed to create class" }, { status: 500 })
+    }
 
     return NextResponse.json(newClass, { status: 201 })
   } catch (error) {
     console.error("Error creating class:", error)
-    return NextResponse.json({ error: "Failed to create class", details: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Failed to create class" }, { status: 500 })
   }
 }
 
@@ -37,14 +44,69 @@ export async function GET(request: Request) {
     const teacherId = searchParams.get("teacherId")
 
     if (teacherId) {
-      const teacherClasses = classesData.filter((cls) => cls.teacherId === teacherId)
-      return NextResponse.json(teacherClasses)
+      const { data, error } = await supabaseAdmin
+        .from("classes")
+        .select(`
+          id, 
+          name, 
+          description, 
+          invite_code,
+          teacher_id,
+          created_at
+        `)
+        .eq("teacher_id", teacherId)
+
+      if (error) {
+        console.error("Error fetching classes:", error)
+        return NextResponse.json({ error: "Failed to fetch classes" }, { status: 500 })
+      }
+
+      // For each class, get the count of students and tasks
+      const classesWithCounts = await Promise.all(
+        data.map(async (cls) => {
+          // Get student count
+          const { count: studentCount, error: studentError } = await supabaseAdmin
+            .from("class_students")
+            .select("*", { count: "exact", head: true })
+            .eq("class_id", cls.id)
+
+          if (studentError) {
+            console.error("Error counting students:", studentError)
+          }
+
+          // Get task count
+          const { count: taskCount, error: taskError } = await supabaseAdmin
+            .from("tasks")
+            .select("*", { count: "exact", head: true })
+            .eq("class_id", cls.id)
+
+          if (taskError) {
+            console.error("Error counting tasks:", taskError)
+          }
+
+          return {
+            ...cls,
+            students: studentCount || 0,
+            tasks: taskCount || 0,
+          }
+        }),
+      )
+
+      return NextResponse.json(classesWithCounts)
     }
 
-    return NextResponse.json(classesData)
+    // If no teacherId is provided, return all classes
+    const { data, error } = await supabaseAdmin.from("classes").select()
+
+    if (error) {
+      console.error("Error fetching all classes:", error)
+      return NextResponse.json({ error: "Failed to fetch classes" }, { status: 500 })
+    }
+
+    return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching classes:", error)
-    return NextResponse.json({ error: "Failed to fetch classes", details: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch classes" }, { status: 500 })
   }
 }
 

@@ -1,13 +1,5 @@
 import { NextResponse } from "next/server"
-
-// This is a simplified auth API for demo purposes
-// In a real app, you would use a proper authentication system
-
-// Mock user database
-const users = new Map([
-  ["student_123", { id: "student_123", name: "Estudiante Demo", role: "student" }],
-  ["teacher_123", { id: "teacher_123", name: "Profesor Demo", role: "teacher" }],
-])
+import { supabaseAdmin } from "@/lib/supabase"
 
 export async function POST(request: Request) {
   try {
@@ -19,22 +11,42 @@ export async function POST(request: Request) {
     }
 
     // Check if user exists
-    if (users.has(userId)) {
-      const user = users.get(userId)
-      return NextResponse.json(user)
+    const { data: existingUser, error: fetchError } = await supabaseAdmin
+      .from("users")
+      .select("user_id, name, role")
+      .eq("user_id", userId)
+      .single()
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      console.error("Database error:", fetchError)
+      return NextResponse.json({ error: "Error checking user" }, { status: 500 })
+    }
+
+    if (existingUser) {
+      return NextResponse.json(existingUser)
     }
 
     // Create new user if it doesn't exist
     const newUser = {
-      id: userId,
+      user_id: userId,
       name: role === "teacher" ? "Profesor Nuevo" : "Estudiante Nuevo",
       role: role || "student",
     }
 
-    users.set(userId, newUser)
+    const { data: createdUser, error: createError } = await supabaseAdmin
+      .from("users")
+      .insert([newUser])
+      .select()
+      .single()
 
-    return NextResponse.json(newUser)
+    if (createError) {
+      console.error("Error creating user:", createError)
+      return NextResponse.json({ error: "Error creating user" }, { status: 500 })
+    }
+
+    return NextResponse.json(createdUser)
   } catch (error) {
+    console.error("Authentication error:", error)
     return NextResponse.json({ error: "Authentication failed" }, { status: 500 })
   }
 }
@@ -48,14 +60,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 })
     }
 
-    const user = users.get(userId)
+    const { data: user, error } = await supabaseAdmin
+      .from("users")
+      .select("user_id, name, role")
+      .eq("user_id", userId)
+      .single()
 
-    if (!user) {
+    if (error) {
+      console.error("Error fetching user:", error)
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     return NextResponse.json(user)
   } catch (error) {
+    console.error("Error in GET user:", error)
     return NextResponse.json({ error: "Failed to get user" }, { status: 500 })
   }
 }

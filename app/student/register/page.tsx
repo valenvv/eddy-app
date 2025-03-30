@@ -40,6 +40,12 @@ export default function StudentRegisterPage() {
         }),
       })
 
+      // Check if the response is JSON before trying to parse it
+      const contentType = joinResponse.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(`Respuesta inesperada del servidor: ${await joinResponse.text()}`)
+      }
+
       const joinData = await joinResponse.json()
 
       if (!joinResponse.ok) {
@@ -57,6 +63,7 @@ export default function StudentRegisterPage() {
       // Redirect to learning style test
       router.push("/student/learning-test")
     } catch (error) {
+      console.error("Registration error:", error) // Add more detailed error logging
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Error al registrarse",

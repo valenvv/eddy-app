@@ -23,6 +23,10 @@ export default function TeacherLoginPage() {
 
     try {
       await login(userId, "teacher")
+
+      // Store the teacher ID in localStorage
+      localStorage.setItem("teacherId", userId)
+
       toast({
         title: "Inicio de sesión exitoso",
         description: "Bienvenido, Profesor",

@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import { generateWithGemini } from "@/lib/gemini-api"
+"use client"
+
+import { env } from "@/lib/env"
 
 // Task difficulty levels
 export type DifficultyLevel = "basic" | "intermediate" | "advanced"
@@ -8,12 +9,24 @@ export type DifficultyLevel = "basic" | "intermediate" | "advanced"
 export type TaskFormat = "multiple-choice" | "short-answer" | "essay" | "practical" | "project" | "quiz"
 
 // Learning styles
-export type LearningStyle = "visual" | "auditory" | "reading" | "kinesthetic"
+export type LearningStyle =
+  | "visual"
+  | "auditory"
+  | "reading"
+  | 'kinesthetic"gStyle = "visual'
+  | "auditory"
+  | "reading"
+  | "kinesthetic"
 
-export async function POST(request: Request) {
+export async function directGenerateTasks(data: {
+  classId: string
+  subject: string
+  description?: string
+  learningObjectives?: string[]
+  difficultyLevel?: DifficultyLevel
+  taskFormats?: TaskFormat[]
+}) {
   try {
-    // Parse the request body
-    const data = await request.json()
     const {
       classId,
       subject,
@@ -24,7 +37,7 @@ export async function POST(request: Request) {
     } = data
 
     if (!classId || !subject) {
-      return NextResponse.json({ error: "ClassId and subject are required" }, { status: 400 })
+      throw new Error("ClassId and subject are required")
     }
 
     // Ensure difficultyLevel is a string to prevent toLowerCase errors
@@ -46,56 +59,100 @@ ${learningObjectives.map((obj: string, i: number) => `${i + 1}. ${String(obj)}`)
 
     // Prepare the prompt - use safeLevel.toUpperCase() to avoid undefined errors
     const prompt = `
-  IMPORTANTE: Genera todo el contenido en ESPAÑOL.
-  
-  Genera opciones de tareas educativas para diferentes estilos de aprendizaje basadas en este tema: "${subject}" ${description ? `con estas instrucciones adicionales: "${description}"` : ""} ${objectivesText}
+    IMPORTANTE: Genera todo el contenido en ESPAÑOL.
+    
+    Genera opciones de tareas educativas para diferentes estilos de aprendizaje basadas en este tema: "${subject}" ${description ? `con estas instrucciones adicionales: "${description}"` : ""} ${objectivesText}
 
-  El nivel de dificultad debe ser: ${safeLevel.toUpperCase()}
-  
-  Para cada estilo de aprendizaje (visual, auditivo, lectura, kinestésico), crea 4 opciones diferentes de tareas que sean apropiadas para estudiantes.
-  
-  Incluye una variedad de formatos de tareas entre las opciones:
-  ${safeFormats.join(", ")}
-  
-  Cada tarea debe tener:
-  1. Un título corto y atractivo (máximo 50 caracteres)
-  2. Una descripción clara que explique lo que el estudiante debe hacer (máximo 200 caracteres)
-  
-  IMPORTANTE: Tu respuesta debe ser un objeto JSON válido con la siguiente estructura:
-  
-  {
-    "visual": [
-      {"id": "v1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "v2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "v3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "v4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
-    ],
-    "auditory": [
-      {"id": "a1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "a2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "a3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "a4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
-    ],
-    "reading": [
-      {"id": "r1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "r2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "r3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "r4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
-    ],
-    "kinesthetic": [
-      {"id": "k1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "k2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "k3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
-      {"id": "k4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
-    ]
-  }
-  
-  Devuelve SOLO el objeto JSON sin texto adicional.
-  `
+    El nivel de dificultad debe ser: ${safeLevel.toUpperCase()}
+    
+    Para cada estilo de aprendizaje (visual, auditivo, lectura, kinestésico), crea 4 opciones diferentes de tareas que sean apropiadas para estudiantes.
+    
+    Incluye una variedad de formatos de tareas entre las opciones:
+    ${safeFormats.join(", ")}
+    
+    Cada tarea debe tener:
+    1. Un título corto y atractivo (máximo 50 caracteres)
+    2. Una descripción clara que explique lo que el estudiante debe hacer (máximo 200 caracteres)
+    
+    IMPORTANTE: Tu respuesta debe ser un objeto JSON válido con la siguiente estructura:
+    
+    {
+      "visual": [
+        {"id": "v1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "v2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "v3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "v4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
+      ],
+      "auditory": [
+        {"id": "a1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "a2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "a3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "a4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
+      ],
+      "reading": [
+        {"id": "r1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "r2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "r3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "r4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
+      ],
+      "kinesthetic": [
+        {"id": "k1", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "k2", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "k3", "title": "Título de la tarea", "description": "Descripción de la tarea"},
+        {"id": "k4", "title": "Título de la tarea", "description": "Descripción de la tarea"}
+      ]
+    }
+    
+    Devuelve SOLO el objeto JSON sin texto adicional.
+    `
 
     try {
-      // Use our utility function to generate content
-      const responseText = await generateWithGemini(prompt)
+      // Use the recommended model directly instead of trying to list and find one
+      const modelName = "gemini-1.5-flash"
+      const apiVersion = "v1"
+
+      console.log(`Using model: ${modelName}`)
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/${apiVersion}/models/${modelName}:generateContent?key=${env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2000,
+            },
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("Gemini API error:", errorText)
+        throw new Error(`Gemini API error: ${errorText}`)
+      }
+
+      const geminiResponse = await response.json()
+
+      // Extract the response text from Gemini's response structure
+      const responseText = geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text || ""
+
+      if (!responseText) {
+        console.error("Empty response from Gemini API")
+        throw new Error("Empty response from Gemini API")
+      }
 
       // Try to parse the response as JSON
       try {
@@ -111,7 +168,7 @@ ${learningObjectives.map((obj: string, i: number) => `${i + 1}. ${String(obj)}`)
 
         if (missingStyles.length > 0) {
           console.log("Missing styles in AI response:", missingStyles)
-          return NextResponse.json(generateMockTaskOptions(subject, description, safeLevel, safeFormats))
+          return generateMockTaskOptions(subject, description, safeLevel, safeFormats)
         }
 
         // Add IDs to the tasks if they don't have them
@@ -126,26 +183,24 @@ ${learningObjectives.map((obj: string, i: number) => `${i + 1}. ${String(obj)}`)
           }))
         })
 
-        return NextResponse.json(result)
+        return result
       } catch (parseError) {
         console.error("Error parsing AI response:", parseError)
-        return NextResponse.json(generateMockTaskOptions(subject, description, safeLevel, safeFormats))
+        return generateMockTaskOptions(subject, description, safeLevel, safeFormats)
       }
     } catch (aiError) {
       console.error("Error with Gemini API:", aiError)
-      return NextResponse.json(generateMockTaskOptions(subject, description, safeLevel, safeFormats))
+      return generateMockTaskOptions(subject, description, safeLevel, safeFormats)
     }
   } catch (error) {
-    console.error("General error in task generation endpoint:", error)
-    // Always return a JSON response with mock data
-    return NextResponse.json(
-      generateMockTaskOptions("General topic", "", "intermediate", [
-        "multiple-choice",
-        "short-answer",
-        "essay",
-        "practical",
-      ]),
-    )
+    console.error("General error in task generation:", error)
+    // Always return mock data
+    return generateMockTaskOptions("General topic", "", "intermediate", [
+      "multiple-choice",
+      "short-answer",
+      "essay",
+      "practical",
+    ])
   }
 }
 

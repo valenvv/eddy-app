@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import TeacherNavigationBar from "@/components/teacher-navigation-bar"
+import { ArrowLeft } from "lucide-react"
 
 export default function CreateClassPage() {
   const router = useRouter()
@@ -29,8 +30,8 @@ export default function CreateClassPage() {
     setIsLoading(true)
 
     try {
-      // In a real app, get the teacherId from authentication
-      const teacherId = "teacher_123"
+      // Get the teacherId from localStorage or use default
+      const teacherId = localStorage.getItem("teacherId") || "teacher_123"
 
       const response = await fetch("/api/classes", {
         method: "POST",
@@ -51,8 +52,13 @@ export default function CreateClassPage() {
 
       toast({
         title: "Clase creada exitosamente",
-        description: `Código de invitación: ${data.inviteCode}`,
+        description: `Código de invitación: ${data.invite_code}`,
       })
+
+      // Store the teacher ID in localStorage if not already there
+      if (!localStorage.getItem("teacherId")) {
+        localStorage.setItem("teacherId", teacherId)
+      }
 
       router.push(`/teacher/dashboard`)
     } catch (error) {
@@ -71,6 +77,17 @@ export default function CreateClassPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-400 via-indigo-300 to-purple-300 flex flex-col items-center p-4 pb-24">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden my-8">
         <div className="p-6">
+          <div className="mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/teacher/dashboard")}
+              className="flex items-center text-blue-600 hover:text-blue-800"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              <span>Volver</span>
+            </Button>
+          </div>
           <h1 className="text-2xl font-bold text-center text-blue-600 mb-6">Crear Nueva Clase</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">

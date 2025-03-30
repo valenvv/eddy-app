@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "@/components/ui/use-toast"
-import { CheckCircle, Clock, Plus } from "lucide-react"
+import { CheckCircle, Clock } from "lucide-react"
 import NavigationBar from "@/components/navigation-bar"
 
 export default function StudentDashboardPage() {
   const [tasks, setTasks] = useState<any[]>([])
+  const [submissions, setSubmissions] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("pending")
   const [learningStyle, setLearningStyle] = useState<string | null>(null)
@@ -18,7 +18,7 @@ export default function StudentDashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // In a real app, get the studentId from authentication
+        // Get the studentId from localStorage
         const studentId = localStorage.getItem("studentId") || "student_123"
 
         // Fetch student's learning style
@@ -38,7 +38,23 @@ export default function StudentDashboardPage() {
 
         const tasksData = await tasksResponse.json()
         setTasks(tasksData)
+
+        // Fetch all submissions by this student to determine completed tasks
+        const submissionsResponse = await fetch(`/api/students/submissions?studentId=${studentId}`)
+
+        if (submissionsResponse.ok) {
+          const submissionsData = await submissionsResponse.json()
+
+          // Create a map of taskId -> completed status
+          const submissionsMap: Record<string, boolean> = {}
+          submissionsData.forEach((submission: any) => {
+            submissionsMap[submission.task_id] = true
+          })
+
+          setSubmissions(submissionsMap)
+        }
       } catch (error) {
+        console.error("Error fetching data:", error)
         toast({
           title: "Error",
           description: error instanceof Error ? error.message : "Failed to fetch data",
@@ -52,18 +68,13 @@ export default function StudentDashboardPage() {
     fetchData()
   }, [])
 
-  // Separate tasks into pending and completed
+  // Separate tasks into pending and completed based on submissions
   const pendingTasks = tasks.flatMap((task) => {
+    // Skip if this task has been submitted by the student
+    if (submissions[task.id]) return []
+
     // For each task, get tasks for the student's learning style
     const tasksForStyle = task.tasksByLearningStyle?.[learningStyle || "visual"] || []
-
-    // Check if any of these tasks have been submitted
-    const isCompleted = task.submissions?.some((submissionId: string) =>
-      // In a real app, you would check if this student has submitted this task
-      submissionId.includes("student_123"),
-    )
-
-    if (isCompleted) return []
 
     return tasksForStyle.map((t: any) => ({
       ...t,
@@ -73,16 +84,11 @@ export default function StudentDashboardPage() {
   })
 
   const completedTasks = tasks.flatMap((task) => {
+    // Only include if this task has been submitted by the student
+    if (!submissions[task.id]) return []
+
     // For each task, get tasks for the student's learning style
     const tasksForStyle = task.tasksByLearningStyle?.[learningStyle || "visual"] || []
-
-    // Check if any of these tasks have been submitted
-    const isCompleted = task.submissions?.some((submissionId: string) =>
-      // In a real app, you would check if this student has submitted this task
-      submissionId.includes("student_123"),
-    )
-
-    if (!isCompleted) return []
 
     return tasksForStyle.map((t: any) => ({
       ...t,
@@ -179,17 +185,6 @@ export default function StudentDashboardPage() {
               )}
             </TabsContent>
           </Tabs>
-
-          {activeTab === "pending" && pendingTasks.length === 0 && (
-            <div className="text-center">
-              <Link href="/student/join-class">
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  <span>Unirse a otra clase</span>
-                </Button>
-              </Link>
-            </div>
-          )}
         </div>
       </div>
 
